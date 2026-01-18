@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EREBUS | Advanced Native C++ Framework</title>
+    <meta name="description" content="Erebus RAT - The most advanced Native C++ Remote Administration Tool. HVNC, Stealer, and Bypass included.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --accent: #06b6d4;
+            --bg-deep: #030005;
+            --bg-card: rgba(15, 15, 20, 0.6);
+            --bg-panel: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --font-ui: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, transparent 50%), linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(3, 0, 5, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: var(--font-code);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-muted); position: relative; }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
+            background: var(--primary); transition: 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        .btn-glow {
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px; font-weight: 600; color: #fff;
+            position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .btn-glow:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #6d28d9, var(--primary));
+            border: none;
+            box-shadow: 0 0 20px rgba(109, 40, 217, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(109, 40, 217, 0.6);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding-top: 100px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px; border-radius: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 12px; color: var(--primary); font-weight: 600;
+            margin-bottom: 25px; font-family: var(--font-code);
+        }
+
+        .pulse {
+            width: 8px; height: 8px; background: var(--primary);
+            border-radius: 50%; box-shadow: 0 0 0 rgba(139,92,246, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139,92,246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(139,92,246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139,92,246, 0); }
+        }
+
+        h1 {
+            font-size: 5rem; line-height: 1.1; font-weight: 800; letter-spacing: -2px;
+            background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 25px; position: relative; z-index: 2;
+        }
+        h1 span {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.25rem; color: var(--text-muted);
+            max-width: 700px; margin: 0 auto 50px; font-weight: 300;
+        }
+
+        .dashboard-wrapper {
+            perspective: 1000px; margin-top: -50px; padding-bottom: 100px;
+            width: 100%; display: flex; justify-content: center;
+        }
+        .dashboard-container {
+            width: 1200px; max-width: 95%; height: 700px;
+            background: rgba(10, 10, 14, 0.7);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 50px 100px -20px rgba(0,0,0,0.7);
+            display: flex; overflow: hidden;
+            transform: rotateX(2deg) translateY(0);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: rotateX(2deg) translateY(0); }
+            50% { transform: rotateX(2deg) translateY(-20px); }
+        }
+
+        .ui-sidebar { width: 260px; background: rgba(0,0,0,0.3); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; }
+        .ui-menu { margin-top: 40px; display: flex; flex-direction: column; gap: 5px; }
+        .ui-item {
+            padding: 12px 15px; border-radius: 10px; color: var(--text-muted);
+            font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .ui-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .ui-item.active { background: rgba(139, 92, 246, 0.1); color: #fff; border: 1px solid rgba(139, 92, 246, 0.2); }
+        .ui-item svg { width: 18px; height: 18px; opacity: 0.7; }
+        .ui-item.active svg { opacity: 1; color: var(--primary); }
+
+        .ui-main {
+            flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 25px;
+            background: radial-gradient(circle at top right, rgba(139,92,246,0.05), transparent 40%);
+        }
+        .ui-topbar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .ui-topbar h2 { font-size: 24px; font-weight: 600; }
+        .ui-topbar p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .status-pill {
+            padding: 6px 12px; background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 6px;
+            color: var(--success); font-size: 12px; font-family: var(--font-code);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .stat-card {
+            background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 16px; padding: 25px; position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+        .card-header {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); margin-bottom: 20px; font-weight: 700;
+            display: flex; justify-content: space-between;
+        }
+        .card-header span { color: var(--primary); }
+        .data-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .data-row:last-child { border: none; margin: 0; padding: 0; }
+        .data-icon {
+            width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #fff;
+        }
+        .data-info { flex: 1; }
+        .data-label { font-size: 12px; color: var(--text-muted); }
+        .data-val { font-size: 14px; font-weight: 500; font-family: var(--font-code); }
+
+        .terminal {
+            flex: 1; background: #09090b; border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px; font-family: var(--font-code);
+            font-size: 13px; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .terminal-header { display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .term-content { color: #a1a1aa; line-height: 1.6; }
+        .cmd-line { display: flex; gap: 10px; }
+        .path { color: var(--accent); }
+        .cursor { width: 8px; height: 18px; background: var(--text-muted); animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .features-section { padding: 100px 50px; max-width: 1400px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-header h2 { font-size: 3rem; margin-bottom: 10px; font-weight: 700; }
+        .section-header p { color: var(--text-muted); }
+
+        .f-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .f-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border); padding: 40px 30px; border-radius: 20px;
+            transition: 0.4s; position: relative;
+        }
+        .f-card:hover {
+            border-color: rgba(139, 92, 246, 0.4); transform: translateY(-10px);
+            background: linear-gradient(180deg, rgba(139,92,246,0.05) 0%, rgba(255,255,255,0.01) 100%);
+        }
+        .f-icon {
+            width: 60px; height: 60px; background: rgba(255,255,255,0.03); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 25px;
+            color: var(--primary); font-size: 24px;
+        }
+        .f-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .f-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+
+        .specs-section {
+            padding: 50px 0; max-width: 1000px; margin: 0 auto 100px;
+        }
+        .specs-container {
+            background: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 20px; overflow: hidden;
+        }
+        .spec-row {
+            display: flex; border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 20px 30px;
+        }
+        .spec-row:last-child { border: none; }
+        .spec-label { width: 30%; color: var(--text-muted); font-weight: 500; }
+        .spec-val { width: 70%; font-family: var(--font-code); color: #fff; }
+
+        footer {
+            border-top: 1px solid var(--border); padding: 60px 0;
+            text-align: center; color: var(--text-muted); font-size: 14px; background: #020103;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
+            EREBUS <span style="font-weight: 300; opacity: 0.5;">PROJECT</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#features">Modules</a>
+            <a href="#specs">Specs</a>
+            <a href="https://github.com/psibladesgod/Erebus" target="_blank">Source Code</a>
+            <a href="#">Documentation</a> 
+        </nav>
+        <div style="display: flex; gap: 15px;">
+            <a href="#" class="btn-glow" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                Community
+            </a>
+            <a href="https://github.com/psibladesgod/Erebus" class="btn-glow btn-primary">Download Build</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="badge"><div class="pulse"></div> v2.1.0 Stable Release</div>
+        <h1>Erebus Projects <br><span>RAT</span></h1>
+        <p class="subtitle">
+            The definitive Remote Administration Tool for Red Teaming. <br>
+            <strong>Native C++ • Zero Dependencies • 15kb Stub • 100% FUD</strong>
+        </p>
+        <div style="display: flex; gap: 20px; z-index: 5;">
+            <a href="https://github.com/psibladesgod/Erebus" class="btn-glow btn-primary" style="padding: 15px 40px; font-size: 16px;">Download Now</a>
+            <a href="#features" class="btn-glow" style="padding: 15px 40px; font-size: 16px;">Explore Features</a>
+        </div>
+    </section>
+
+    <div class="dashboard-wrapper">
+        <div class="dashboard-container">
+            <div class="ui-sidebar">
+                <div style="font-size: 12px; color: #555; font-weight: 700; letter-spacing: 1px;">OPERATIONS</div>
+                <div class="ui-menu">
+                    <div class="ui-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        Bot Control
+                    </div>
+                    <div class="ui-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"></path></svg>
+                        Terminal
+                    </div>
+                    <div class="ui-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                        Modules
+                    </div>
+                </div>
+                <div style="margin-top: auto; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
+                    <div style="font-size: 11px; color: var(--text-muted);">CURRENT SESSION</div>
+                    <div style="color: #fff; font-family: var(--font-code); font-size: 12px; margin-top: 4px;">ID: #9F2-XK4</div>
+                </div>
+            </div>
+
+            <div class="ui-main">
+                <div class="ui-topbar">
+                    <div>
+                        <h2>Target: DESKTOP-HQ81B</h2>
+                        <p>Windows 11 Enterprise | Admin Privileges</p>
+                    </div>
+                    <div class="status-pill"><div class="pulse" style="width: 6px; height: 6px; background: var(--success); box-shadow: none;"></div> ONLINE</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="card-header">Hardware Telemetry <span>LIVE</span></div>
+                        <div class="data-row">
+                            <div style="display:flex; align-items:center; width:100%">
+                                <div class="data-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line></svg></div>
+                                <div class="data-info">
+                                    <div class="data-label">Processor</div>
+                                    <div class="data-val">Core i9-13900K @ 5.8GHz</div>
+                                </div>
+                                <div style="color: var(--accent); font-weight:700;">12%</div>
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div style="display:flex; align-items:center; width:100%">
+                                <div class="data-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
+                                <div class="data-info">
+                                    <div class="data-label">Memory Usage</div>
+                                    <div class="data-val">14.2 GB / 64 GB</div>
+                                </div>
+                                <div style="color: var(--success); font-weight:700;">22%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="card-header">Network <span>SECURE</span></div>
+                        <div class="data-row">
+                            <div class="data-info">
+                                <div class="data-label">External IP</div>
+                                <div class="data-val">192.168.0.1 <span style="color:#555; margin-left: 5px;">(Proxy Chained)</span></div>
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-info">
+                                <div class="data-label">Geo Location</div>
+                                <div class="data-val">🇺🇸 Santa Clara, CA</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 10px; color: #555; margin-top: 5px; text-align: right;">UP: 450 KB/s</div>
+                    </div>
+                </div>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="dot" style="background: #ef4444"></div>
+                        <div class="dot" style="background: #f59e0b"></div>
+                        <div class="dot" style="background: #10b981"></div>
+                    </div>
+                    <div class="term-content">
+                        <div><span style="color: var(--success);">[+]</span> Connection established successfully. Handshake verified.</div>
+                        <div><span style="color: var(--primary);">[*]</span> Injecting payload into svchost.exe (PID: 3912)...</div>
+                        <div><span style="color: var(--success);">[+]</span> Injection Complete. Thread created.</div>
+                        <div><span style="color: #555;">[DEBUG]</span> Bypass defender: <span style="color: var(--success);">TRUE</span></div>
+                        <br>
+                        <div class="cmd-line">
+                            <span class="path">root@erebus:~#</span>
+                            <span>execute_module --silent</span>
+                            <div class="cursor"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="features" class="features-section">
+        <div class="section-header">
+            <h2>Modules & Capabilities</h2>
+            <p>Comprehensive toolset for advanced Red Team operations.</p>
+        </div>
+
+        <div class="f-grid">
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
+                <h3>Polymorphic Engine</h3>
+                <p>Advanced builder that mutates code signature on every compilation. Ensures 99.9% FUD (Fully Undetectable) rates against modern AV/EDR solutions like Defender, SentinelOne, and CrowdStrike.</p>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                </div>
+                <h3>Silent HVNC</h3>
+                <p>Operate a hidden virtual desktop on the target machine. Launch browsers (Chrome, Edge), access banking portals, and manipulate files without the user seeing any mouse movement.</p>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                </div>
+                <h3>Native C++ Core</h3>
+                <p>Zero dependencies. Runs on fresh Windows installs (XP to 11) without .NET Framework or Java. Extremely lightweight stub (~40KB) optimized for stability.</p>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h3>Advanced Stealer</h3>
+                <p>Instantly recover passwords, cookies, and autofill data from 30+ browsers. Automatic extraction of crypto wallets (MetaMask, Exodus) and session tokens (Discord, Telegram).</p>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </div>
+                <h3>File Manager</h3>
+                <p>High-speed file transfer protocol. Browse, upload, download, execute, and delete files with a familiar explorer interface. Supports Zip/Unzip and secure deletion.</p>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22 6 12 13 2 6"></polyline></svg>
+                </div>
+                <h3>Keylogger & Clipper</h3>
+                <p>Kernel-level keystroke logging with offline storage and Unicode support. Clipboard monitoring to automatically replace crypto addresses (BTC, ETH, XMR) in real-time.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="specs" class="specs-section">
+        <div class="section-header">
+            <h2>Technical Specifications</h2>
+            <p>Built for performance. Optimized for stealth.</p>
+        </div>
+        <div class="specs-container">
+            <div class="spec-row">
+                <div class="spec-label">Language / Architecture</div>
+                <div class="spec-val">C++ 17 (Native) / x86 & x64 Support</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-label">Communication Protocol</div>
+                <div class="spec-val">Encrypted TCP Sockets (AES-256 + RSA-4096)</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-label">Dependencies</div>
+                <div class="spec-val">None (Statically Linked CRT)</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-label">Supported OS</div>
+                <div class="spec-val">Windows 7, 8, 8.1, 10, 11, Server 2012-2022</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-label">Binary Size (Stub)</div>
+                <div class="spec-val">~45 KB (Packed) / ~120 KB (Unpacked)</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-label">Persistence Methods</div>
+                <div class="spec-val">Registry, Task Scheduler, Startup Folder, DLL Hijacking</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 EREBUS PROJECT. <span style="color: var(--primary)">End-to-End Encrypted Communication.</span></p>
+        <p style="font-size: 12px; margin-top: 10px; opacity: 0.5;">Disclaimer: This tool is for educational purposes and authorized security testing only.</p>
+    </footer>
+
+</body>
+</html>
